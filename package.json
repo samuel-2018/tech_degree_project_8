@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,10 @@
     "pug": "^2.0.4",
     "sequelize": "^5.10.3",
     "sequelize-cli": "^5.5.0",
-    "sqlite3": "^4.0.9"
+    "sqlite3": "^4.0.9",
+    "http-errors": "~1.6.3",
+    "cookie-parser": "~1.4.4",
+    "morgan": "~1.9.1",
+    "debug": "~2.6.9"
   }
 }
