@@ -19,15 +19,15 @@ router.get('/', (req, res, next) => {
 
 /* GET create new book form. */
 router.get('/new', (req, res, next) => {
-  res.render('books/new-book', { book: {}, title: 'New Book' });
+  res.render('books/new-book', { book: Book.build(), title: 'New Book' });
 });
 
 /* POST new book to database. */
 router.post('/new', (req, res, next) => {
   Book.create(req.body)
-    .then((book) => {
-      // show the new book
-      res.redirect(`/books/${book.id}`);
+    .then(() => {
+      // Goes back to main page.
+      res.redirect('/books');
     })
     .catch((error) => {
       res.send(500, error);
@@ -35,8 +35,8 @@ router.post('/new', (req, res, next) => {
 });
 
 /* GET book detail form (update book). */
-router.get('/books/:id', (req, res, next) => {
-  Book.findById(req.params.id)
+router.get('/:id', (req, res, next) => {
+  Book.findByPk(req.params.id)
     .then((book) => {
       res.render('books/update-book', { book, title: 'Update Book' });
     })
@@ -46,11 +46,11 @@ router.get('/books/:id', (req, res, next) => {
 });
 
 /* POST updated book info to database. */
-router.post('/books/:id', (req, res, next) => {
-  Book.update(req.body)
-    .then((book) => {
-      // show the updated book
-      res.redirect(`/books/${book.id}`);
+router.post('/:id', (req, res, next) => {
+  Book.update(req.body, { where: { id: req.params.id } })
+    .then(() => {
+      // Goes back to main page.
+      res.redirect('/books');
     })
     .catch((error) => {
       res.send(500, error);
@@ -58,13 +58,15 @@ router.post('/books/:id', (req, res, next) => {
 });
 
 /* POST book to delete from database. */
-router.post('/books/:id/delete', (req, res, next) => {
-  // TO DO Create a confirmation pop-up.
-
-  Book.delete(req.params.id)
+router.post('/:id/delete', (req, res, next) => {
+  // In the html, there is a onsubmit event that will show a confirmation pop-up.
+  Book.findByPk(req.params.id)
+    .then((book) => {
+      book.destroy();
+    })
     .then(() => {
       // Goes back to main page.
-      res.redirect('books');
+      res.redirect('/books');
     })
     .catch((error) => {
       res.send(500, error);
@@ -72,6 +74,6 @@ router.post('/books/:id/delete', (req, res, next) => {
 });
 
 // TO DO: Add error handling for 404s.
-// This may require using "Books.findById" to check that it exists before taking an action such as update or delete.
+// This may require using "Books.findByPk" to check that it exists before taking an action such as update or delete.
 
 module.exports = router;
