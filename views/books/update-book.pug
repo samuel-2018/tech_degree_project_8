@@ -1,11 +1,17 @@
 extends ../layout
 
 block content
+  //- If values are undefined, sets them to ''
+  - const {id, title: bookTitle='', author='', genre='', year=''} = book.dataValues;
 
-  - const {id, title: bookTitle, author, genre, year} = book.dataValues;
   h1= title
 
   form(method='post', action=`/books/${id}`)
+    if errors
+      h2(class='error') Ooops!
+      ul(class='error')
+        each error in errors
+          li= error.message
     p
       label(for='title') Title
       input(name='title', type='text', id='title' value=`${bookTitle}`)

@@ -1,22 +1,29 @@
 extends ../layout
 
 block content
+  //- If values are undefined, sets them to ''
+  - const {id, title: bookTitle='', author='', genre='', year=''} = book.dataValues;
 
   h1= title
 
   form(method='post', action='/books/new')
+    if errors
+      h2(class='error') Ooops!
+      ul(class='error')
+        each error in errors
+          li= error.message
     p
       label(for='title') Title
-      input(name='title', type='text', id='title' value='')
+      input(name='title', type='text', id='title' value=`${bookTitle}`)
     p
       label(for='author') Author
-      input(name='author', type='text', id='author' value='')
+      input(name='author', type='text', id='author' value=`${author}`)
     p
       label(for='genre') Genre
-      input(name='genre', type='text', id='genre' value='')
+      input(name='genre', type='text', id='genre' value=`${genre}`)
     p
       label(for='year') Year
-      input(name='year', type='text', id='year' value='')
+      input(name='year', type='text', id='year' value=`${year}`)
     p
       input(class='input-submit', type='submit', value='Create New Book')
 
