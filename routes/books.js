@@ -101,6 +101,17 @@ router.post('/new', (req, res, next) => {
       res.redirect('/books');
     })
     .catch((error) => {
+      if (error.name === 'SequelizeValidationError') {
+        res.render('books/new-book', {
+          book: Book.build(req.body),
+          errors: error.errors,
+          title: 'New Book',
+        });
+      } else {
+        throw error;
+      }
+    })
+    .catch((error) => {
       res.send(500, error);
     });
 });
@@ -109,8 +120,6 @@ router.post('/new', (req, res, next) => {
 
 /* GET book detail form (update book). */
 router.get('/:id', (req, res, next) => {
-  console.log("router.get('/:id' RAN");
-
   Book.findByPk(req.params.id)
     .then((book) => {
       res.render('books/update-book', { book, title: 'Update Book' });
@@ -123,6 +132,19 @@ router.get('/:id', (req, res, next) => {
 /* POST updated book info to database. */
 router.post('/:id', (req, res, next) => {
   Book.update(req.body, { where: { id: req.params.id } })
+    .catch((error) => {
+      if (error.name === 'SequelizeValidationError') {
+        res.render('books/update-book', {
+          // Creates book instance,
+          // passing in prev values and id from URL
+          book: Book.build({ ...req.body, id: req.params.id }),
+          errors: error.errors,
+          title: 'Update Book',
+        });
+      } else {
+        throw error;
+      }
+    })
     .then(() => {
       // Goes back to main page.
       res.redirect('/books');
