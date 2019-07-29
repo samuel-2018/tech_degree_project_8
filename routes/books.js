@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-// Is this correct? Is there a way to access the instance already in the program? or is this not creating an instance? Does it create a second copy of anything?
+// TO DO Does this create an extra copy? Is there a better way?
 const Sequelize = require('sequelize');
 
 const { Op } = Sequelize;
@@ -13,7 +13,6 @@ const { Book } = require('../models');
 /* GET redirects to results page. */
 router.get('/', (req, res, next) => {
   res.redirect('/books/catalog/1');
-  // could it do ./results  ? doesn't seem to work
 });
 
 // I want '/' and 'results' to go to the below:
@@ -86,73 +85,75 @@ router.get('/search/:query/:page', (req, res, next) => {
     });
 });
 
-// both 'new's could be grouped under router.route('/new', ....
+router
+  .route('/new')
 
-/* GET create new book form. */
-router.get('/new', (req, res, next) => {
-  res.render('books/new-book', { book: Book.build(), title: 'New Book' });
-});
+  /* GET create new book form. */
+  .get((req, res, next) => {
+    res.render('books/new-book', { book: Book.build(), title: 'New Book' });
+  })
 
-/* POST new book to database. */
-router.post('/new', (req, res, next) => {
-  Book.create(req.body)
-    .then(() => {
-      // Goes back to main page.
-      res.redirect('/books');
-    })
-    .catch((error) => {
-      if (error.name === 'SequelizeValidationError') {
-        res.render('books/new-book', {
-          book: Book.build(req.body),
-          errors: error.errors,
-          title: 'New Book',
-        });
-      } else {
-        throw error;
-      }
-    })
-    .catch((error) => {
-      res.send(500, error);
-    });
-});
+  /* POST new book to database. */
+  .post((req, res, next) => {
+    Book.create(req.body)
+      .then(() => {
+        // Goes back to main page.
+        res.redirect('/books');
+      })
+      .catch((error) => {
+        if (error.name === 'SequelizeValidationError') {
+          res.render('books/new-book', {
+            book: Book.build(req.body),
+            errors: error.errors,
+            title: 'New Book',
+          });
+        } else {
+          throw error;
+        }
+      })
+      .catch((error) => {
+        res.send(500, error);
+      });
+  });
 
-// both '/:id's could be grouped under router.route('/:id', ....
+router
+  .route('/:id')
 
-/* GET book detail form (update book). */
-router.get('/:id', (req, res, next) => {
-  Book.findByPk(req.params.id)
-    .then((book) => {
-      res.render('books/update-book', { book, title: 'Update Book' });
-    })
-    .catch((error) => {
-      res.send(500, error);
-    });
-});
+  /* GET book detail form (update book). */
+  .get((req, res, next) => {
+    Book.findByPk(req.params.id)
+      .then((book) => {
+        res.render('books/update-book', { book, title: 'Update Book' });
+      })
+      .catch((error) => {
+        res.send(500, error);
+      });
+  })
 
-/* POST updated book info to database. */
-router.post('/:id', (req, res, next) => {
-  Book.update(req.body, { where: { id: req.params.id } })
-    .catch((error) => {
-      if (error.name === 'SequelizeValidationError') {
-        res.render('books/update-book', {
-          // Creates book instance,
-          // passing in prev values and id from URL
-          book: Book.build({ ...req.body, id: req.params.id }),
-          errors: error.errors,
-          title: 'Update Book',
-        });
-      } else {
-        throw error;
-      }
-    })
-    .then(() => {
-      // Goes back to main page.
-      res.redirect('/books');
-    })
-    .catch((error) => {
-      res.send(500, error);
-    });
-});
+  /* POST updated book info to database. */
+  .post((req, res, next) => {
+    Book.update(req.body, { where: { id: req.params.id } })
+      .catch((error) => {
+        if (error.name === 'SequelizeValidationError') {
+          res.render('books/update-book', {
+            // Creates book instance,
+            // passing in prev values and id from URL
+            book: Book.build({ ...req.body, id: req.params.id }),
+            errors: error.errors,
+            title: 'Update Book',
+          });
+        } else {
+          throw error;
+        }
+      })
+      .then(() => {
+        // Goes back to main page.
+        res.redirect('/books');
+      })
+      .catch((error) => {
+        res.send(500, error);
+      });
+  });
 
 /* POST book to delete from database. */
 router.post('/:id/delete', (req, res, next) => {
