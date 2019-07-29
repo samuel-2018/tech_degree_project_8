@@ -3,22 +3,41 @@ extends ../layout
 block content
   
   h1= title
-  p
+  nav.main-nav
     a.button(href='/books/new') Create New Book
-  table
-    thead
-      tr
-        th Title
-        th Author
-        th Genre
-        th Year
-    each book in books
-      - const {id, title, author, genre, year} = book.dataValues;
-      tr
-        td 
-          a(href=`/books/${id}`) #{title}
-        td #{author}
-        td #{genre}
-        td #{year}
- 
-  //- IMPORTANT: `/books/${id}` must have the '/' before 'books' --- Otherwise may get a 404.
+
+    form(class='search', method='get', action='/books/search') 
+      input(class='search__input', type='search', name='search' value='', aria-label="search books")
+      input(class='search__submit input-submit', type='submit', value='Search')
+
+
+  div.content-width
+    table
+      thead
+        tr
+          th Title
+          th Author
+          th Genre
+          th Year
+      each book in books
+        - const {id, title, author, genre, year} = book.dataValues;
+        tr
+          td 
+            //- IMPORTANT: `/books/${id}` must have the '/' before 'books' --- Otherwise may get a 404.
+            a(href=`/books/${id}`) #{title}
+          td #{author}
+          td #{genre}
+          td #{year}
+
+    nav.pagination
+      - let page = 1;
+      while page <= pages
+        div.pagination__item
+          if query
+            - const className = (page === activePage ? 'active':'')
+            a.button.block(class=className, href=`/books/search/${query}/${page}`)= page
+            - page++
+          else
+            - const className = (page === activePage ? 'active':'')
+            a.button.block(class=className, href=`/books/catalog/${page}`)= page
+            - page++
