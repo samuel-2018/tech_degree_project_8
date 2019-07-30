@@ -4,14 +4,14 @@ block content
   
   h1= title
   nav.main-nav
-    a.button(href='/books/new') Create New Book
+    a.button(class='main-nav__item', href='/books/new') Create New Book
 
-    form(class='search', method='get', action='/books/search') 
+    form(class='search main-nav__item', method='get', action='/books/search') 
       input(class='search__input', type='search', name='search' value='', aria-label="search books")
       input(class='search__submit input-submit', type='submit', value='Search')
 
 
-  div.content-width
+  div
     table
       thead
         tr
