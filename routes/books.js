@@ -2,46 +2,70 @@ const express = require('express');
 
 const router = express.Router();
 
-// TO DO Does this create an extra copy? Is there a better way?
+// TO DO Does this create an extra copy?
 const Sequelize = require('sequelize');
 
+// Sequelize operators
 const { Op } = Sequelize;
 
-// provides access to database via Book
+// Database access
 const { Book } = require('../models');
 
-/* GET redirects to results page. */
+// Determines pagination
+const booksPerPage = 10;
+
+// =================================
+// ROUTING - Helpers
+// =================================
+
+const renderBooks = (paginationURL, result, res, req) => {
+  // Total books
+  const { count } = result;
+  // Book data
+  const books = result.rows;
+  // Number of pages
+  const pages = count >= booksPerPage ? Math.ceil(count / booksPerPage) : 1;
+
+  res.render('books', {
+    books,
+    title: 'Books',
+    pages,
+    // Page number; Anchor will be given 'active' class.
+    activePage: parseInt(req.params.page, 10),
+    paginationURL,
+  });
+};
+
+// =================================
+// ROUTING - Retrieve from Database
+// =================================
+
+// GET - Redirect
 router.get('/', (req, res, next) => {
   res.redirect('/books/catalog/1');
 });
 
-// I want '/' and 'results' to go to the below:
-
-/* GET full list of books. */
+// GET - Full list of books
 router.get('/catalog/:page', (req, res, next) => {
-  Book.findAndCountAll({ order: [['title', 'ASC']], offset: 10 * (req.params.page - 1), limit: 10 })
+  Book.findAndCountAll({
+    // Sort results
+    order: [['title', 'ASC']],
+    // SQL pagination
+    offset: booksPerPage * (req.params.page - 1),
+    limit: booksPerPage,
+  })
     .then((result) => {
-      const { count } = result;
-      const books = result.rows;
-
-      // Determines number of pages
-      // Will return whole number
-      const pages = count >= 10 ? Math.ceil(count / 10) : 1;
-
-      res.render('books', {
-        books,
-        title: 'Books',
-        pages,
-        activePage: parseInt(req.params.page, 10),
-        query: false,
-      });
+      // For page links
+      const paginationURL = '/books/catalog/';
+      // See 'Routing - Helpers'
+      renderBooks(paginationURL, result, res, req);
     })
     .catch((error) => {
       res.send(500, error);
     });
 });
 
-/* GET redirects to search results. */
+// GET - Redirect
 router.get('/search', (req, res, next) => {
   // Retrieves query.
   const query = req.query.search;
@@ -49,9 +73,10 @@ router.get('/search', (req, res, next) => {
   res.redirect(`/books/search/${query}/1`);
 });
 
-/* GET search list of books. */
+// GET - List of search results
 router.get('/search/:query/:page', (req, res, next) => {
   Book.findAndCountAll({
+    // Search
     where: {
       [Op.or]: [
         { title: { [Op.substring]: req.params.query } },
@@ -60,48 +85,45 @@ router.get('/search/:query/:page', (req, res, next) => {
         { year: { [Op.substring]: req.params.query } },
       ],
     },
+    // Sort results
     order: [['title', 'ASC']],
-    offset: 10 * (req.params.page - 1),
-    limit: 10,
+    // SQL pagination
+    offset: booksPerPage * (req.params.page - 1),
+    limit: booksPerPage,
   })
     .then((result) => {
-      const { count } = result;
-      const books = result.rows;
-
-      // Determines number of pages
-      // Will return whole number
-      const pages = count >= 10 ? Math.ceil(count / 10) : 1;
-
-      res.render('books', {
-        books,
-        title: 'Books',
-        pages,
-        activePage: parseInt(req.params.page, 10),
-        query: req.params.query,
-      });
+      // For page links
+      const paginationURL = `/books/search/${req.params.query}/`;
+      // See 'Routing - Helpers'
+      renderBooks(paginationURL, result, res, req);
     })
     .catch((error) => {
       res.send(500, error);
     });
 });
 
+// =================================
+// ROUTING - Change Database
+// =================================
+
+// New book
 router
   .route('/new')
-
-  /* GET create new book form. */
+  // GET - New book form
   .get((req, res, next) => {
     res.render('books/new-book', { book: Book.build(), title: 'New Book' });
   })
-
-  /* POST new book to database. */
+  // POST - New book to database
   .post((req, res, next) => {
     Book.create(req.body)
       .then(() => {
-        // Goes back to main page.
+        // Back to main page
         res.redirect('/books');
       })
       .catch((error) => {
+        // Catches validation error sent from Sequelize
         if (error.name === 'SequelizeValidationError') {
+          // Renders page with error message(s)
           res.render('books/new-book', {
             book: Book.build(req.body),
             errors: error.errors,
@@ -116,10 +138,10 @@ router
       });
   });
 
+// Update book
 router
   .route('/:id')
-
-  /* GET book detail form (update book). */
+  // GET - Update book form
   .get((req, res, next) => {
     Book.findByPk(req.params.id)
       .then((book) => {
@@ -129,12 +151,17 @@ router
         res.send(500, error);
       });
   })
-
-  /* POST updated book info to database. */
+  // POST - Updated book to database
   .post((req, res, next) => {
     Book.update(req.body, { where: { id: req.params.id } })
+      .then(() => {
+        // Back to main page
+        res.redirect('/books');
+      })
       .catch((error) => {
+        // Catches validation error sent from Sequelize
         if (error.name === 'SequelizeValidationError') {
+          // Renders page with error message(s)
           res.render('books/update-book', {
             // Creates book instance,
             // passing in prev values and id from URL
@@ -146,16 +173,12 @@ router
           throw error;
         }
       })
-      .then(() => {
-        // Goes back to main page.
-        res.redirect('/books');
-      })
       .catch((error) => {
         res.send(500, error);
       });
   });
 
-/* POST book to delete from database. */
+// POST - Delete book from database
 router.post('/:id/delete', (req, res, next) => {
   // In the html, there is a onsubmit event that will show a confirmation pop-up.
   Book.findByPk(req.params.id)
@@ -163,7 +186,7 @@ router.post('/:id/delete', (req, res, next) => {
       book.destroy();
     })
     .then(() => {
-      // Goes back to main page.
+      // Back to main page.
       res.redirect('/books');
     })
     .catch((error) => {

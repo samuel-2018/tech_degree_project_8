@@ -33,11 +33,6 @@ block content
       - let page = 1;
       while page <= pages
         div.pagination__item
-          if query
-            - const className = (page === activePage ? 'active':'')
-            a.button.block(class=className, href=`/books/search/${query}/${page}`)= page
-            - page++
-          else
-            - const className = (page === activePage ? 'active':'')
-            a.button.block(class=className, href=`/books/catalog/${page}`)= page
-            - page++
+          - const className = (page === activePage ? 'active':'')
+          a.button.block(class=className, href=`${paginationURL, page}`)= page
+          - page++
