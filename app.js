@@ -34,8 +34,16 @@ app.use((err, req, res, next) => {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  // res.status(err.status || 500);
+  if (err.status === 404) {
+    res.status(404);
+    console.log('404: Page not found');
+    res.render('books/page-not-found');
+  } else {
+    res.status(500);
+    res.render('error');
+    console.log('500: Something went wrong.');
+  }
 });
 
 module.exports = app;
