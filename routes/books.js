@@ -36,6 +36,15 @@ const renderBooks = (paginationURL, result, res, req) => {
   });
 };
 
+const pageOutOfRange = (count, page) => {
+  const totalPages = count >= booksPerPage ? Math.ceil(count / booksPerPage) : 1;
+  // Is the requested page number larger than the total page count?
+  if (page > totalPages) {
+    return true;
+  }
+  return false;
+};
+
 // =================================
 // ROUTING - Retrieve from Database
 // =================================
@@ -53,16 +62,20 @@ router.get('/catalog/:page', (req, res, next) => {
     // SQL pagination
     offset: booksPerPage * (req.params.page - 1),
     limit: booksPerPage,
-  })
-    .then((result) => {
-      // For page links
-      const paginationURL = '/books/catalog/';
-      // See 'Routing - Helpers'
-      renderBooks(paginationURL, result, res, req);
-    })
-    .catch((error) => {
-      res.send(500, error);
-    });
+  }).then((result) => {
+    // See 'Routing - Helpers'
+    if (pageOutOfRange(result.count, req.params.page)) {
+      // 500
+      const error = new Error('Server Error.');
+      error.status = 500;
+      return next(error);
+    }
+
+    // For page links
+    const paginationURL = '/books/catalog/';
+    // See 'Routing - Helpers'
+    renderBooks(paginationURL, result, res, req);
+  });
 });
 
 // GET - Redirect
@@ -90,16 +103,19 @@ router.get('/search/:query/:page', (req, res, next) => {
     // SQL pagination
     offset: booksPerPage * (req.params.page - 1),
     limit: booksPerPage,
-  })
-    .then((result) => {
-      // For page links
-      const paginationURL = `/books/search/${req.params.query}/`;
-      // See 'Routing - Helpers'
-      renderBooks(paginationURL, result, res, req);
-    })
-    .catch((error) => {
-      res.send(500, error);
-    });
+  }).then((result) => {
+    // See 'Routing - Helpers'
+    if (pageOutOfRange(result.count, req.params.page)) {
+      // 500
+      const error = new Error('Server Error.');
+      error.status = 500;
+      return next(error);
+    }
+    // For page links
+    const paginationURL = `/books/search/${req.params.query}/`;
+    // See 'Routing - Helpers'
+    renderBooks(paginationURL, result, res, req);
+  });
 });
 
 // =================================
@@ -129,12 +145,8 @@ router
             errors: error.errors,
             title: 'New Book',
           });
-        } else {
-          throw error;
         }
-      })
-      .catch((error) => {
-        res.send(500, error);
+        // All other errors will be handled in app.js
       });
   });
 
@@ -143,17 +155,30 @@ router
   .route('/:id')
   // GET - Update book form
   .get((req, res, next) => {
-    Book.findByPk(req.params.id)
-      .then((book) => {
-        res.render('books/update-book', { book, title: 'Update Book' });
-      })
-      .catch((error) => {
-        res.send(500, error);
-      });
+    Book.findByPk(req.params.id).then((book) => {
+      // Does book exist?
+      if (book) {
+        return res.render('books/update-book', { book, title: 'Update Book' });
+      }
+      // 500
+      const error = new Error('Server Error.');
+      error.status = 500;
+      return next(error);
+    });
   })
   // POST - Updated book to database
   .post((req, res, next) => {
-    Book.update(req.body, { where: { id: req.params.id } })
+    Book.findByPk(req.params.id)
+      .then((book) => {
+        // Does book exist?
+        if (book) {
+          return book.update(req.body);
+        }
+        // 500
+        const error = new Error('Server Error.');
+        error.status = 500;
+        return next(error);
+      })
       .then(() => {
         // Back to main page
         res.redirect('/books');
@@ -169,12 +194,8 @@ router
             errors: error.errors,
             title: 'Update Book',
           });
-        } else {
-          throw error;
         }
-      })
-      .catch((error) => {
-        res.send(500, error);
+        // All other errors will be handled in app.js
       });
   });
 
@@ -183,18 +204,19 @@ router.post('/:id/delete', (req, res, next) => {
   // In the html, there is a onsubmit event that will show a confirmation pop-up.
   Book.findByPk(req.params.id)
     .then((book) => {
-      book.destroy();
+      // Does book exist?
+      if (book) {
+        return book.destroy();
+      }
+      // 500
+      const error = new Error('Server Error.');
+      error.status = 500;
+      return next(error);
     })
     .then(() => {
       // Back to main page.
       res.redirect('/books');
-    })
-    .catch((error) => {
-      res.send(500, error);
     });
 });
-
-// TO DO: Add error handling for 404s.
-// This may require using "Books.findByPk" to check that it exists before taking an action such as update or delete.
 
 module.exports = router;
