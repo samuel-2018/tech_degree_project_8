@@ -57,6 +57,10 @@ h2 {
   padding-top: 20px;
 }
 
+table {
+  max-width: 629px;
+}
+
 th {
   border-bottom: 2px solid #d8b493;
   text-align: left;
@@ -64,7 +68,7 @@ th {
 }
 
 tr {
-  min-height: 50px;
+  height: 52px;
 }
 
 tr:nth-child(2n) {
@@ -99,17 +103,46 @@ input[type="text"] {
 .error {
   color: rgb(236, 15, 15);
 }
-/* **************** */
+
+/*******************************/
+/* Main Nav                    */
+/*******************************/
+
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  max-width: 629px;
+}
+
+.main-nav__item {
+  margin: 10px 5px 10px;
+}
+
+.search__input {
+  border: 2px solid #019875;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  font-size: 12px;
+}
+
+.search__submit {
+  /* Overides margin set elsewhere */
+  margin-left: 0px;
+  border-radius: 0 4px 4px 0;
+}
+
+/*******************************/
+/* Pagination                  */
+/*******************************/
 
 .pagination {
   display: flex;
   justify-content: center;
+  max-width: 629px;
 }
 .pagination__item {
   margin: 20px 5px;
-}
-.content-width {
-  width: fit-content;
 }
 
 .block {
@@ -117,23 +150,40 @@ input[type="text"] {
   need to be set to block to be able to scale. */
   display: block;
 }
+
 a.active {
   background-color: #01b189;
   transform: scale(1.2);
 }
-.main-nav {
-  display: flex;
-  justify-content: space-between;
-}
-.search__input {
-  border: 2px solid #019875;
-  border-right: none;
-  border-radius: 4px 0 0 4px;
-  font-size: 12px;
-}
-.search__submit {
-  /* Overides margin set elsewhere */
-  margin-left: 0px;
 
-  border-radius: 0 4px 4px 0;
+/*******************************/
+/* Media Queries               */
+/*******************************/
+
+@media (max-width: 575px) {
+  body {
+    padding: 0;
+  }
+
+  th,
+  td {
+    padding: 5px 10px 5px 10px;
+  }
+  tr {
+    height: 50px;
+  }
+
+  .main-nav {
+    justify-content: flex-end;
+  }
+  .search {
+    display: flex;
+    flex-grow: 2;
+  }
+  .search__input {
+    flex-grow: 2;
+  }
+  .search__submit {
+    flex-grow: 0;
+  }
 }
