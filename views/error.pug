@@ -1,6 +1,14 @@
 extends layout
 
+//- block content
+//-   h1= message
+//-   h2= error.status
+//-   pre #{error.stack}
+
+
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+  h1 Server Error
+  p Sorry! There was an unexpected error on the server.
+  br
+  p
+    a(class='button', href='/books') Home
