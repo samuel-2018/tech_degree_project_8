@@ -9,29 +9,32 @@ block content
     form(class='search main-nav__item', method='get', action='/books/search') 
       input(class='search__input', type='search', name='search' value='', aria-label="search books")
       input(class='search__submit input-submit', type='submit', value='Search')
+      
+  if books[0]
+    div
+      table
+        thead
+          tr
+            th Title
+            th Author
+            th Genre
+            th Year
+        each book in books
+          - const {id, title, author, genre, year} = book.dataValues;
+          tr
+            td 
+              //- IMPORTANT: `/books/${id}` must have the '/' before 'books' --- Otherwise may get a 404.
+              a(href=`/books/${id}`) #{title}
+            td #{author}
+            td #{genre}
+            td #{year}
 
-  div
-    table
-      thead
-        tr
-          th Title
-          th Author
-          th Genre
-          th Year
-      each book in books
-        - const {id, title, author, genre, year} = book.dataValues;
-        tr
-          td 
-            //- IMPORTANT: `/books/${id}` must have the '/' before 'books' --- Otherwise may get a 404.
-            a(href=`/books/${id}`) #{title}
-          td #{author}
-          td #{genre}
-          td #{year}
-
-    nav.pagination
-      - let page = 1;
-      while page <= pages
-        div.pagination__item
-          - const className = (page === activePage ? 'active':'')
-          a.button.block(class=className, href=`${paginationURL, page}`)= page
-          - page++
+      nav.pagination
+        - let page = 1;
+        while page <= pages
+          div.pagination__item
+            - const className = (page === activePage ? 'active':'')
+            a.button.block(class=className, href=`${paginationURL, page}`)= page
+            - page++
+  else  
+    h2 There were no results matching your query.
