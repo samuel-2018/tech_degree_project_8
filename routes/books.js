@@ -56,6 +56,13 @@ router.get('/', (req, res, next) => {
 
 // GET - Full list of books
 router.get('/catalog/:page', (req, res, next) => {
+  // Is page not a number?
+  if (Number.isNaN(Number(req.params.page))) {
+    // 500
+    const error = new Error('Server Error.');
+    error.status = 500;
+    return next(error);
+  }
   Book.findAndCountAll({
     // Sort results
     order: [['title', 'ASC']],
@@ -70,7 +77,6 @@ router.get('/catalog/:page', (req, res, next) => {
       error.status = 500;
       return next(error);
     }
-
     // For page links
     const paginationURL = '/books/catalog/';
     // See 'Routing - Helpers'
@@ -89,6 +95,14 @@ router.get('/search', (req, res, next) => {
 
 // GET - List of search results
 router.get('/search/:query/:page', (req, res, next) => {
+  // Is page not a number?
+  if (Number.isNaN(Number(req.params.page))) {
+    // 500
+    const error = new Error('Server Error.');
+    error.status = 500;
+    return next(error);
+  }
+
   Book.findAndCountAll({
     // Search
     where: {
@@ -167,6 +181,7 @@ router
       return next(error);
     });
   })
+
   // POST - Updated book to database
   .post((req, res, next) => {
     Book.findByPk(req.params.id)
