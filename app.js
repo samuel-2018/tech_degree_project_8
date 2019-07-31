@@ -3,11 +3,15 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+// Favicon
+const favicon = require('serve-favicon');
+
+const app = express();
+
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 const indexRouter = require('./routes/index');
 const booksRouter = require('./routes/books');
-
-const app = express();
 
 // view engine setup
 app.set('view engine', 'pug');
