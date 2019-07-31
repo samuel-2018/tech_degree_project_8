@@ -118,12 +118,17 @@ input[type="text"] {
 .main-nav__item {
   margin: 10px 5px 10px;
 }
+.search {
+  /* Causes search input and button to align*/
+  display: flex;
+}
 
 .search__input {
   border: 2px solid #019875;
   border-right: none;
   border-radius: 4px 0 0 4px;
-  font-size: 12px;
+  font-size: 17px;
+  padding: 7px;
 }
 
 .search__submit {
@@ -169,6 +174,7 @@ a.active {
   td {
     padding: 5px 10px 5px 10px;
   }
+
   tr {
     height: 50px;
   }
@@ -176,13 +182,16 @@ a.active {
   .main-nav {
     justify-content: flex-end;
   }
+
   .search {
     display: flex;
     flex-grow: 2;
   }
+
   .search__input {
     flex-grow: 2;
   }
+
   .search__submit {
     flex-grow: 0;
   }
