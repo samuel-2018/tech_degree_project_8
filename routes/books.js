@@ -81,7 +81,8 @@ router.get('/catalog/:page', (req, res, next) => {
 // GET - Redirect
 router.get('/search', (req, res, next) => {
   // Retrieves query.
-  const query = req.query.search;
+  // (Defaults to empty string to avoid a 404.)
+  const query = req.query.search ? req.query.search : ' ';
   // Redirects with query and page 1
   res.redirect(`/books/search/${query}/1`);
 });
