@@ -5,10 +5,12 @@
   },
   "test": {
     "storage": "library.db",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "dialectModule": "mysql2"
   },
   "production": {
     "storage": "library.db",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "dialectModule": "mysql2"
   }
 }
