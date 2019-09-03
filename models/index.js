@@ -4,10 +4,6 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 
-// https://github.com/sequelize/sequelize/issues/9489#issuecomment-493304014
-// Needed to fix sequelize issues with WebPack
-const mysql2 = require("mysql2");
-
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.json")[env];
