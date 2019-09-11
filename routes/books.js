@@ -5,8 +5,11 @@ const router = express.Router();
 // Database access
 const { Book } = require("../models");
 
+const Sequelize = require("sequelize");
+
 // Sequelize operators
-const { Op } = Book.sequelize;
+// const { Op } = Book.sequelize;
+const { Op } = Sequelize;
 
 // Determines pagination
 const booksPerPage = 10;
