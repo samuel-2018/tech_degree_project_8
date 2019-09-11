@@ -2,10 +2,10 @@
   "name": "tech_degree_project_8",
   "version": "1.0.0",
   "description": "SQL Library Manager",
-  "main": "./bin/www",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
