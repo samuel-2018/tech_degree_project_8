@@ -12,7 +12,7 @@
     "url": "git+https://github.com/samuel-2018/tech_degree_project_8.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "",
   "bugs": {
     "url": "https://github.com/samuel-2018/tech_degree_project_8/issues"
   },
@@ -23,7 +23,6 @@
     "express": "^4.17.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "mysql": "^2.17.1",
     "pug": "^2.0.4",
     "sequelize": "^5.10.3",
     "sequelize-cli": "^5.5.0",

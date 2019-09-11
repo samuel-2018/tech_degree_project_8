@@ -5,10 +5,10 @@
   },
   "test": {
     "storage": "library.db",
-    "dialect": "mysql"
+    "dialect": "sqlite"
   },
   "production": {
     "storage": "library.db",
-    "dialect": "mysql"
+    "dialect": "sqlite"
   }
 }
